@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Delete Farmer{% endblock %}
+{% block page_title %}Delete Farmer{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:40px auto;">
+  <div class="card-body" style="text-align:center;padding:40px;">
+    <div style="width:64px;height:64px;background:#fce4ec;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:#c62828;"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 style="font-size:22px;margin-bottom:8px;">Delete Farmer?</h3>
+    <p style="color:var(--text-muted);margin-bottom:24px;">Are you sure you want to delete <strong>{{ farmer.name }}</strong> ({{ farmer.farmer_id }})? This will also delete all their milk collection records. This action cannot be undone.</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <a href="{% url 'farmer_list' %}" class="btn btn-outline">Cancel</a>
+      <form method="post" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete</button></form>
+    </div>
+  </div>
+</div>
+{% endblock %}

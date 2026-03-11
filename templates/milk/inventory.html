@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Inventory — DairyPro{% endblock %}
+{% block page_title %}Inventory{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h2>Inventory Management</h2><p>Track dairy supplies and stock levels</p></div>
+    <a href="{% url 'inventory_add' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Item</a>
+</div>
+<div class="card">
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Unit</th><th>Current Stock</th><th>Min Stock</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for item in items %}
+        <tr>
+          <td><strong>{{ item.name }}</strong></td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.unit }}</td>
+          <td><strong>{{ item.current_stock }}</strong></td>
+          <td>{{ item.min_stock }}</td>
+          <td><span class="badge {% if item.current_stock <= item.min_stock %}badge-danger{% else %}badge-success{% endif %}">{% if item.current_stock <= item.min_stock %}Low Stock{% else %}OK{% endif %}</span></td>
+          <td><a href="{% url 'stock_transaction' item.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-exchange-alt"></i> Update Stock</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No inventory items. <a href="{% url 'inventory_add' %}">Add one</a></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

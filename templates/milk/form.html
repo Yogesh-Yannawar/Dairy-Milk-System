@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} — DairyPro{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h2>{{ title }}</h2></div>
+    <a href="{% url 'collection_list' %}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="card" style="max-width:600px;">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Farmer *</label>
+          <select name="farmer" class="form-control" required {% if collection %}disabled{% endif %}>
+            {% for f in farmers %}
+            <option value="{{ f.pk }}" {% if collection and collection.farmer.pk == f.pk %}selected{% endif %}>{{ f.name }} ({{ f.farmer_id }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" name="date" class="form-control" value="{% if collection %}{{ collection.date|date:'Y-m-d' }}{% else %}{{ today }}{% endif %}" required {% if collection %}readonly{% endif %}>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Shift *</label>
+        <div style="display:flex;gap:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border:1.5px solid var(--border);border-radius:8px;flex:1;" id="m-label">
+            <input type="radio" name="shift" value="morning" {% if not collection or collection.shift == 'morning' %}checked{% endif %} onchange="highlightShift()"> <i class="fas fa-sun" style="color:#f4a300"></i> Morning
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 16px;border:1.5px solid var(--border);border-radius:8px;flex:1;" id="e-label">
+            <input type="radio" name="shift" value="evening" {% if collection and collection.shift == 'evening' %}checked{% endif %} onchange="highlightShift()"> <i class="fas fa-moon" style="color:#5c6bc0"></i> Evening
+          </label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity (Litres) *</label>
+          <input type="number" step="0.01" name="quantity" class="form-control" value="{% if collection %}{{ collection.quantity }}{% endif %}" placeholder="e.g. 10.5" required oninput="calcRate()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fat % *</label>
+          <input type="number" step="0.1" name="fat" id="fat" class="form-control" value="{% if collection %}{{ collection.fat }}{% endif %}" placeholder="e.g. 4.2" required oninput="calcRate()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">SNF % *</label>
+          <input type="number" step="0.1" name="snf" id="snf" class="form-control" value="{% if collection %}{{ collection.snf }}{% endif %}" placeholder="e.g. 8.5" required oninput="calcRate()">
+        </div>
+      </div>
+      <div style="background:var(--primary-pale);padding:14px 16px;border-radius:10px;margin-bottom:16px;display:flex;gap:24px;">
+        <div><div style="font-size:12px;color:var(--text-muted)">Estimated Rate</div><div style="font-size:20px;font-weight:700;color:var(--primary)" id="est-rate">&#8377;—</div></div>
+        <div><div style="font-size:12px;color:var(--text-muted)">Estimated Amount</div><div style="font-size:20px;font-weight:700;color:var(--success)" id="est-amt">&#8377;—</div></div>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Entry</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function calcRate() {
+    const fat = parseFloat(document.getElementById('fat').value) || 0;
+    const snf = parseFloat(document.getElementById('snf').value) || 0;
+    const qty = parseFloat(document.querySelector('[name=quantity]').value) || 0;
+    let rate = 25.0 + (fat - 3.5) * 2.0 + (snf - 8.5) * 1.5;
+    if (rate < 15) rate = 15;
+    document.getElementById('est-rate').textContent = '₹' + rate.toFixed(2);
+    document.getElementById('est-amt').textContent = '₹' + (rate * qty).toFixed(2);
+}
+function highlightShift() {}
+calcRate();
+</script>
+{% endblock %}

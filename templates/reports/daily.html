@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Daily Report{% endblock %}
+{% block page_title %}Daily Report{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h2>Daily Collection Report</h2></div>
+    <a href="javascript:window.print()" class="btn btn-outline"><i class="fas fa-print"></i> Print</a>
+</div>
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body">
+    <form method="get" style="display:flex;gap:12px;align-items:flex-end;">
+      <div class="form-group" style="margin:0;flex:1;max-width:200px;">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" value="{{ report_date }}" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">View Report</button>
+    </form>
+  </div>
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-sun"></i></div><div class="stat-info"><div class="stat-value">{{ totals.morning_qty|floatformat:1 }}L</div><div class="stat-label">Morning Shift</div><div class="stat-sub">&#8377;{{ totals.morning_amt|floatformat:0 }}</div></div></div>
+  <div class="stat-card"><div class="stat-icon amber"><i class="fas fa-moon"></i></div><div class="stat-info"><div class="stat-value">{{ totals.evening_qty|floatformat:1 }}L</div><div class="stat-label">Evening Shift</div><div class="stat-sub">&#8377;{{ totals.evening_amt|floatformat:0 }}</div></div></div>
+  <div class="stat-card"><div class="stat-icon green"><i class="fas fa-flask"></i></div><div class="stat-info"><div class="stat-value">{{ totals.total_qty|floatformat:1 }}L</div><div class="stat-label">Total Collection</div><div class="stat-sub">&#8377;{{ totals.total_amt|floatformat:0 }}</div></div></div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>Detail — {{ report_date }}</h3></div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Farmer</th><th>Shift</th><th>Qty (L)</th><th>Fat%</th><th>SNF%</th><th>Rate</th><th>Amount</th></tr></thead>
+        <tbody>
+        {% for c in collections %}
+        <tr>
+          <td><strong>{{ c.farmer.name }}</strong> <small style="color:var(--text-muted)">({{ c.farmer.farmer_id }})</small></td>
+          <td><span class="badge {% if c.shift == 'morning' %}badge-info{% else %}badge-warning{% endif %}">{{ c.shift|title }}</span></td>
+          <td>{{ c.quantity }}</td>
+          <td>{{ c.fat }}</td>
+          <td>{{ c.snf }}</td>
+          <td>&#8377;{{ c.rate }}</td>
+          <td><strong>&#8377;{{ c.total_amount }}</strong></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No collections on this date</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

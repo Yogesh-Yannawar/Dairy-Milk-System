@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — DairyPro{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_farmers }}</div>
+            <div class="stat-label">Active Farmers</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber"><i class="fas fa-flask"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ today_milk|floatformat:1 }}L</div>
+            <div class="stat-label">Today's Milk</div>
+            <div class="stat-sub">₹{{ today_amount|floatformat:0 }} collected</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-calendar-alt"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ month_milk|floatformat:1 }}L</div>
+            <div class="stat-label">This Month</div>
+            <div class="stat-sub">₹{{ month_amount|floatformat:0 }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">₹{{ pending_amount|floatformat:0 }}</div>
+            <div class="stat-label">Pending Payments</div>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px;">
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-line" style="color:var(--primary)"></i> Last 7 Days Collection</h3>
+        </div>
+        <div class="card-body">
+            <canvas id="collectionChart" height="90"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-bolt" style="color:var(--accent)"></i> Quick Actions</h3>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <a href="{% url 'collection_add' %}" class="btn btn-primary" style="justify-content:center;"><i class="fas fa-plus"></i> Record Milk Collection</a>
+            <a href="{% url 'farmer_add' %}" class="btn btn-outline" style="justify-content:center;"><i class="fas fa-user-plus"></i> Add New Farmer</a>
+            <a href="{% url 'generate_bill' %}" class="btn btn-accent" style="justify-content:center;"><i class="fas fa-file-invoice"></i> Generate Bill</a>
+            <a href="{% url 'daily_report' %}" class="btn btn-outline" style="justify-content:center;"><i class="fas fa-file-alt"></i> Daily Report</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-clock" style="color:var(--primary)"></i> Recent Collections</h3>
+        <a href="{% url 'collection_list' %}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Farmer</th><th>Date</th><th>Shift</th><th>Qty (L)</th><th>Fat%</th><th>SNF%</th><th>Rate</th><th>Amount</th></tr></thead>
+                <tbody>
+                {% for c in recent_collections %}
+                <tr>
+                    <td><strong>{{ c.farmer.name }}</strong><br><small style="color:var(--text-muted)">{{ c.farmer.farmer_id }}</small></td>
+                    <td>{{ c.date|date:"d M Y" }}</td>
+                    <td><span class="badge {% if c.shift == 'morning' %}badge-info{% else %}badge-warning{% endif %}">{{ c.shift|title }}</span></td>
+                    <td><strong>{{ c.quantity }}</strong></td>
+                    <td>{{ c.fat }}</td>
+                    <td>{{ c.snf }}</td>
+                    <td>₹{{ c.rate|floatformat:2 }}</td>
+                    <td><strong style="color:var(--success)">₹{{ c.total_amount|floatformat:2 }}</strong></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No collections today</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const ctx = document.getElementById('collectionChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Litres Collected',
+            data: {{ chart_data|safe }},
+            backgroundColor: 'rgba(26,71,42,0.15)',
+            borderColor: '#1a472a',
+            borderWidth: 2,
+            borderRadius: 6,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { family: 'DM Sans' } } },
+            x: { grid: { display: false }, ticks: { font: { family: 'DM Sans' } } }
+        }
+    }
+});
+</script>
+{% endblock %}

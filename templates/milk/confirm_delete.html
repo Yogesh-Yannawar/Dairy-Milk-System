@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Delete Entry{% endblock %}
+{% block page_title %}Delete Entry{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:40px auto;">
+  <div class="card-body" style="text-align:center;padding:40px;">
+    <div style="width:64px;height:64px;background:#fce4ec;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:#c62828;"><i class="fas fa-exclamation-triangle"></i></div>
+    <h3 style="font-size:22px;margin-bottom:8px;">Delete Collection Entry?</h3>
+    <p style="color:var(--text-muted);margin-bottom:24px;">Delete entry for <strong>{{ collection.farmer.name }}</strong> on {{ collection.date }} ({{ collection.shift }})?</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <a href="{% url 'collection_list' %}" class="btn btn-outline">Cancel</a>
+      <form method="post" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button></form>
+    </div>
+  </div>
+</div>
+{% endblock %}

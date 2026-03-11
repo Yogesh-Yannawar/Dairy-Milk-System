@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ farmer.name }} — DairyPro{% endblock %}
+{% block page_title %}Farmer Profile{% endblock %}
+{% block content %}
+<div class="breadcrumb"><a href="{% url 'farmer_list' %}">Farmers</a><span>/</span>{{ farmer.name }}</div>
+<div style="display:grid;grid-template-columns:320px 1fr;gap:24px;">
+  <div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-body" style="text-align:center;padding:30px 20px;">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);color:white;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">{{ farmer.name|first|upper }}</div>
+        <h3 style="font-size:20px;margin-bottom:4px;">{{ farmer.name }}</h3>
+        <div style="color:var(--text-muted);font-size:13px;">{{ farmer.farmer_id }}</div>
+        <span class="badge {% if farmer.is_active %}badge-success{% else %}badge-danger{% endif %}" style="margin-top:8px;">{% if farmer.is_active %}Active{% else %}Inactive{% endif %}</span>
+        <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;">
+          <a href="{% url 'farmer_edit' farmer.pk %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
+          <a href="{% url 'farmer_delete' farmer.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Details</h3></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+          <div><div style="color:var(--text-muted);margin-bottom:2px;">Phone</div><strong>{{ farmer.phone }}</strong></div>
+          <div><div style="color:var(--text-muted);margin-bottom:2px;">Address</div><strong>{{ farmer.address }}</strong></div>
+          {% if farmer.email %}<div><div style="color:var(--text-muted);margin-bottom:2px;">Email</div><strong>{{ farmer.email }}</strong></div>{% endif %}
+          {% if farmer.bank_name %}<div><div style="color:var(--text-muted);margin-bottom:2px;">Bank</div><strong>{{ farmer.bank_name }}</strong></div>{% endif %}
+          {% if farmer.account_number %}<div><div style="color:var(--text-muted);margin-bottom:2px;">Account</div><strong>{{ farmer.account_number }}</strong></div>{% endif %}
+          <div><div style="color:var(--text-muted);margin-bottom:2px;">Member Since</div><strong>{{ farmer.joining_date|date:"d M Y" }}</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="stats-grid" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-icon green"><i class="fas fa-flask"></i></div><div class="stat-info"><div class="stat-value">{{ total_supply|floatformat:1 }}L</div><div class="stat-label">Total Supply</div></div></div>
+      <div class="stat-card"><div class="stat-icon amber"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><div class="stat-value">&#8377;{{ total_earnings|floatformat:0 }}</div><div class="stat-label">Total Earnings</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Recent Collections</h3></div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>Date</th><th>Shift</th><th>Qty (L)</th><th>Fat%</th><th>SNF%</th><th>Rate</th><th>Amount</th></tr></thead>
+            <tbody>
+            {% for c in collections %}
+            <tr>
+              <td>{{ c.date|date:"d M Y" }}</td>
+              <td><span class="badge {% if c.shift == 'morning' %}badge-info{% else %}badge-warning{% endif %}">{{ c.shift|title }}</span></td>
+              <td>{{ c.quantity }}</td>
+              <td>{{ c.fat }}</td>
+              <td>{{ c.snf }}</td>
+              <td>&#8377;{{ c.rate }}</td>
+              <td><strong>&#8377;{{ c.total_amount }}</strong></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted)">No collections yet</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Bill Detail{% endblock %}
+{% block page_title %}Bill Detail{% endblock %}
+{% block content %}
+<div class="breadcrumb"><a href="{% url 'payment_list' %}">Payments</a><span>/</span>Bill #{{ payment.pk }}</div>
+<div style="display:grid;grid-template-columns:1fr 300px;gap:24px;">
+  <div class="card">
+    <div class="card-header">
+      <h3>Collection Details — {{ payment.farmer.name }}</h3>
+      <span class="badge {% if payment.status == 'paid' %}badge-success{% elif payment.status == 'partial' %}badge-warning{% else %}badge-danger{% endif %}">{{ payment.status|title }}</span>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Date</th><th>Shift</th><th>Qty (L)</th><th>Fat%</th><th>SNF%</th><th>Rate</th><th>Amount</th></tr></thead>
+          <tbody>
+          {% for c in collections %}
+          <tr>
+            <td>{{ c.date|date:"d M Y" }}</td>
+            <td><span class="badge {% if c.shift == 'morning' %}badge-info{% else %}badge-warning{% endif %}">{{ c.shift|title }}</span></td>
+            <td>{{ c.quantity }}</td>
+            <td>{{ c.fat }}</td>
+            <td>{{ c.snf }}</td>
+            <td>&#8377;{{ c.rate }}</td>
+            <td><strong>&#8377;{{ c.total_amount }}</strong></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+          <tfoot><tr style="background:var(--primary-pale)"><td colspan="2"><strong>TOTAL</strong></td><td><strong>{{ payment.total_quantity }}L</strong></td><td colspan="3"></td><td><strong style="color:var(--primary)">&#8377;{{ payment.total_amount }}</strong></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="card-header"><h3>Bill Summary</h3></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted)">Farmer</span><strong>{{ payment.farmer.name }}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted)">Period</span><strong>{{ payment.from_date|date:"d M" }} – {{ payment.to_date|date:"d M Y" }}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted)">Total Quantity</span><strong>{{ payment.total_quantity }}L</strong></div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;justify-content:space-between;"><span>Total Amount</span><strong style="font-size:18px;color:var(--primary)">&#8377;{{ payment.total_amount }}</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span>Paid</span><strong style="color:var(--success)">&#8377;{{ payment.paid_amount }}</strong></div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:12px;"><span>Due</span><strong style="font-size:16px;color:var(--danger)">&#8377;{{ payment.due_amount }}</strong></div>
+        </div>
+        {% if payment.status != 'paid' %}
+        <form method="post" action="{% url 'mark_paid' payment.pk %}" style="margin-top:16px;">
+          {% csrf_token %}
+          <div class="form-group"><label class="form-label">Mark as Paid (&#8377;)</label><input type="number" step="0.01" name="paid_amount" class="form-control" value="{{ payment.total_amount }}"></div>
+          <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-check"></i> Mark Paid</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    <div style="margin-top:12px;"><a href="javascript:window.print()" class="btn btn-outline" style="width:100%"><i class="fas fa-print"></i> Print Bill</a></div>
+  </div>
+</div>
+{% endblock %}

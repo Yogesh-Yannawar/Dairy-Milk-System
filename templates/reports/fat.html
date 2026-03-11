@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Fat Report{% endblock %}
+{% block page_title %}Fat Quality Report{% endblock %}
+{% block content %}
+<div class="page-header"><div><h2>Fat and SNF Quality Report</h2></div></div>
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body">
+    <form method="get" style="display:flex;gap:12px;align-items:flex-end;">
+      <div class="form-group" style="margin:0;"><label class="form-label">From Date</label><input type="date" name="from_date" value="{{ from_date }}" class="form-control"></div>
+      <div class="form-group" style="margin:0;"><label class="form-label">To Date</label><input type="date" name="to_date" value="{{ to_date }}" class="form-control"></div>
+      <button type="submit" class="btn btn-primary">View</button>
+    </form>
+  </div>
+</div>
+<div class="stat-card" style="margin-bottom:20px;display:inline-flex;">
+  <div class="stat-icon green"><i class="fas fa-chart-pie"></i></div>
+  <div class="stat-info"><div class="stat-value">{{ overall_fat|floatformat:2 }}%</div><div class="stat-label">Overall Average Fat</div></div>
+</div>
+<div class="card">
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Farmer</th><th>ID</th><th>Avg Fat%</th><th>Avg SNF%</th><th>Total Qty (L)</th><th>Fat Rating</th></tr></thead>
+        <tbody>
+        {% for d in data %}
+        <tr>
+          <td><strong>{{ d.farmer__name }}</strong></td>
+          <td>{{ d.farmer__farmer_id }}</td>
+          <td><strong>{{ d.avg_fat|floatformat:2 }}</strong></td>
+          <td>{{ d.avg_snf|floatformat:2 }}</td>
+          <td>{{ d.total_qty|floatformat:1 }}</td>
+          <td>
+            {% if d.avg_fat >= 5 %}<span class="badge badge-success">Excellent</span>
+            {% elif d.avg_fat >= 4 %}<span class="badge badge-info">Good</span>
+            {% elif d.avg_fat >= 3.5 %}<span class="badge badge-warning">Average</span>
+            {% else %}<span class="badge badge-danger">Low</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No data for this period</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

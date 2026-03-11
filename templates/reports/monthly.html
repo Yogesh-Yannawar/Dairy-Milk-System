@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Monthly Report{% endblock %}
+{% block page_title %}Monthly Report{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div><h2>Monthly Farmer Report</h2></div>
+    <a href="javascript:window.print()" class="btn btn-outline"><i class="fas fa-print"></i> Print</a>
+</div>
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body">
+    <form method="get" style="display:flex;gap:12px;align-items:flex-end;">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Month</label>
+        <select name="month" class="form-control">
+          {% for num, name in months %}<option value="{{ num }}" {% if num == month %}selected{% endif %}>{{ name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Year</label>
+        <select name="year" class="form-control">
+          {% for y in years %}<option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">View</button>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><h3>Farmer-wise Summary — {{ from_date|date:"d M" }} to {{ to_date|date:"d M Y" }}</h3></div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Farmer ID</th><th>Name</th><th>Total Qty (L)</th><th>Avg Fat%</th><th>Avg SNF%</th><th>Total Amount</th></tr></thead>
+        <tbody>
+        {% for f in farmer_data %}
+        <tr>
+          <td>{{ f.farmer__farmer_id }}</td>
+          <td><strong>{{ f.farmer__name }}</strong></td>
+          <td>{{ f.total_qty|floatformat:1 }}</td>
+          <td>{{ f.avg_fat|floatformat:1 }}</td>
+          <td>{{ f.avg_snf|floatformat:1 }}</td>
+          <td><strong style="color:var(--success)">&#8377;{{ f.total_amt|floatformat:2 }}</strong></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No data for this period</td></tr>
+        {% endfor %}
+        </tbody>
+        {% if farmer_data %}
+        <tfoot><tr style="background:var(--primary-pale);font-weight:600"><td colspan="2">GRAND TOTAL</td><td>{{ grand_total.qty|floatformat:1 }}L</td><td colspan="2"></td><td>&#8377;{{ grand_total.amt|floatformat:2 }}</td></tr></tfoot>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
