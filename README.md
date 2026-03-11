@@ -10,7 +10,6 @@
 
 1. Extract the project:
 ```bash
-tar -xzf dairy_project.tar.gz
 cd dairy_project
 ```
 
@@ -21,6 +20,7 @@ pip install django pillow
 
 3. Run migrations:
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -36,9 +36,6 @@ python manage.py runserver
 
 6. Open browser: http://127.0.0.1:8000
 
-## Demo Login
-- **Username:** admin
-- **Password:** admin123
 
 ## Features
 - ✅ Role-based login (Admin, Staff, Accountant)
